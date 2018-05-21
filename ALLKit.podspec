@@ -7,7 +7,6 @@ Pod::Spec.new do |s|
   s.author                     = { 'Georgy Kasapidi' => 'geor.kasapidi@icloud.com' }
   s.source                     = { :git => 'https://github.com/geor-kasapidi/ALLKit.git', :tag => "v#{s.version}" }
   s.platform                   = :ios, '8.0'
-  s.swift_version              = '4'
   s.requires_arc               = true
   s.source_files               = 'Sources/*.swift'
   s.frameworks                 = 'Foundation', 'UIKit'
