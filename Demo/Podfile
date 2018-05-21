@@ -1,0 +1,13 @@
+inhibit_all_warnings!
+
+target 'Demo' do
+	pod 'ALLKit', :path => '../'
+	pod 'GDPerformanceView-Swift'
+	pod 'YYWebImage', :modular_headers => true
+	pod 'Yoga', :modular_headers => true
+end
+
+target 'Tests' do
+	pod 'ALLKit', :path => '../'
+	pod 'Yoga', :modular_headers => true
+end
