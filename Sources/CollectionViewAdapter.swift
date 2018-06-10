@@ -5,7 +5,7 @@ public final class CollectionViewAdapter<CollectionViewType: UICollectionView>: 
     public struct ScrollEvents {
         public var didScroll: ((UIScrollView) -> Void)?
         public var willBeginDragging: ((UIScrollView) -> Void)?
-        public var willEndDragging: ((UIScrollView, CGPoint, CGPoint) -> Void)? // velocity, targetContentOffset
+        public var willEndDragging: ((UIScrollView, CGPoint, UnsafeMutablePointer<CGPoint>) -> Void)? // velocity, targetContentOffset
         public var didEndDragging: ((UIScrollView, Bool) -> Void)? // decelerate
         public var willBeginDecelerating: ((UIScrollView) -> Void)?
         public var didEndDecelerating: ((UIScrollView) -> Void)?
@@ -344,7 +344,7 @@ public final class CollectionViewAdapter<CollectionViewType: UICollectionView>: 
     }
 
     public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        scrollEvents.willEndDragging?(scrollView, velocity, targetContentOffset.pointee)
+        scrollEvents.willEndDragging?(scrollView, velocity, targetContentOffset)
     }
 
     public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
