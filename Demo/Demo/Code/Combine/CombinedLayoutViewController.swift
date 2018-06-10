@@ -4,17 +4,8 @@ import ALLKit
 
 final class CombinedLayoutViewController: UIViewController {
     private lazy var scrollView = UIScrollView()
-
-    private lazy var layoutView = SwitcherListLayoutView()
-
-    private lazy var layoutDescription = SwitcherListLayoutDescription(titleList: DemoContent.NATO)
-
-    private var currentLayout: ViewLayout<SwitcherListLayoutView>? {
-        didSet {
-            currentLayout?.configure(view: layoutView)
-            scrollView.contentSize = currentLayout?.size ?? .zero
-        }
-    }
+    private lazy var contentView = UIView()
+    private lazy var layoutSpec = SwitcherListLayoutSpec(titleList: DemoContent.NATO)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,7 +15,7 @@ final class CombinedLayoutViewController: UIViewController {
 
             view.addSubview(scrollView)
 
-            scrollView.addSubview(layoutView)
+            scrollView.addSubview(contentView)
         }
     }
 
@@ -33,6 +24,9 @@ final class CombinedLayoutViewController: UIViewController {
 
         scrollView.frame = view.bounds
 
-        currentLayout = layoutDescription.makeViewLayoutWith(boundingSize: BoundingSize(width: view.bounds.width, height: .nan))
+        let layout = layoutSpec.makeLayoutWith(boundingSize: BoundingSize(width: view.bounds.width))
+
+        scrollView.contentSize = layout.size
+        layout.setup(in: contentView)
     }
 }

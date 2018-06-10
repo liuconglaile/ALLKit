@@ -1,9 +1,11 @@
 import Foundation
 
-public protocol Diffable {
-    var diffId: String { get }
+public protocol AnyEquatable {
+    func isEqual(to object: Any) -> Bool
+}
 
-    func isEqual(to object: Diffable) -> Bool
+public protocol Diffable: AnyEquatable {
+    var diffId: String { get }
 }
 
 public struct DiffResult {

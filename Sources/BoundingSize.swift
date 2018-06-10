@@ -5,15 +5,9 @@ public struct BoundingSize: Equatable {
     public let width: CGFloat
     public let height: CGFloat
 
-    public init(width: CGFloat,
-                height: CGFloat) {
-
+    public init(width: CGFloat = .nan, height: CGFloat = .nan) {
         self.width = width
         self.height = height
-    }
-
-    var cgSize: CGSize {
-        return CGSize(width: width, height: height)
     }
 
     public static func == (lhs: BoundingSize, rhs: BoundingSize) -> Bool {

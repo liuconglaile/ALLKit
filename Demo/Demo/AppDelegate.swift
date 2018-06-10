@@ -1,4 +1,5 @@
 import UIKit
+import GDPerformanceView_Swift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -6,8 +7,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
-        let vc = RootViewController()
-        let nc = UINavigationController(rootViewController: vc)
+        let nc = UINavigationController(rootViewController: RootViewController())
+        nc.navigationBar.isTranslucent = false
 
         let wnd: UIWindow
 
@@ -22,6 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = wnd
 
         wnd.makeKeyAndVisible()
+
+        GDPerformanceMonitor.sharedInstance.startMonitoring()
 
         return true
     }

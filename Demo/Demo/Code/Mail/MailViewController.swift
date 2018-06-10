@@ -42,13 +42,17 @@ final class MailViewController: UIViewController {
 
         adapter.collectionView.frame = view.bounds
 
-        adapter.set(boundingSize: BoundingSize(width: view.bounds.width, height: .nan))
+        adapter.set(boundingSize: BoundingSize(width: view.bounds.width))
     }
 
     private var rows: [MailRow] = [] {
         didSet {
-            let items = rows.map { row -> ListViewItem in
-                var item = ListItem(id: row.id, model: row, layoutDescription: MailRowLayoutDescription(title: row.title, text: row.text))
+            let items = rows.map { row -> ListItem in
+                let item = ListItem(
+                    id: row.id,
+                    model: row,
+                    layoutSpec: MailRowLayoutSpec(title: row.title, text: row.text)
+                )
 
                 let deleteAction = SwipeAction(
                     text: "Delete".attributed().font(.boldSystemFont(ofSize: 10)).foregroundColor(.white).make(),
@@ -70,7 +74,11 @@ final class MailViewController: UIViewController {
                         strongSelf.present(alert, animated: true, completion: nil)
                 })
 
-                item.swipeActions = [deleteAction, customAction]
+                item.actions.onSwipe = [deleteAction, customAction]
+
+                item.actions.onSelect = {
+                    SwipeView.closeAll(animated: true)
+                }
 
                 return item
             }

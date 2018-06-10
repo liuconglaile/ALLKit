@@ -16,18 +16,10 @@ final class LayoutTransitionViewController: UIViewController {
     )
 
     private lazy var scrollView = UIScrollView()
+    private lazy var contentView = UIView()
 
-    private lazy var layoutView = ProfileLayoutView()
-
-    private lazy var portraitLayoutDescription = PortraitProfileLayoutDescription(profile: userProfile)
-    private lazy var landscapeLayoutDescription = LandscapeProfileLayoutDescription(profile: userProfile)
-
-    private var currentLayout: ViewLayout<ProfileLayoutView>? {
-        didSet {
-            currentLayout?.configure(view: layoutView)
-            scrollView.contentSize = currentLayout?.size ?? .zero
-        }
-    }
+    private lazy var portraitLayoutSpec = PortraitProfileLayoutSpec(profile: userProfile)
+    private lazy var landscapeLayoutSpec = LandscapeProfileLayoutSpec(profile: userProfile)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,7 +29,7 @@ final class LayoutTransitionViewController: UIViewController {
 
             view.addSubview(scrollView)
 
-            scrollView.addSubview(layoutView)
+            scrollView.addSubview(contentView)
         }
     }
     
@@ -48,10 +40,11 @@ final class LayoutTransitionViewController: UIViewController {
 
         let size = view.bounds.size
 
-        if size.width > size.height {
-            currentLayout = landscapeLayoutDescription.makeViewLayoutWith(boundingSize: BoundingSize(width: size.width, height: .nan))
-        } else {
-            currentLayout = portraitLayoutDescription.makeViewLayoutWith(boundingSize: BoundingSize(width: size.width, height: .nan))
-        }
+        let layoutSpec = size.width > size.height ? landscapeLayoutSpec : portraitLayoutSpec
+
+        let layout = layoutSpec.makeLayoutWith(boundingSize: BoundingSize(width: size.width))
+
+        scrollView.contentSize = layout.size
+        layout.setup(in: contentView)
     }
 }

@@ -7,3 +7,6 @@ before_install:
   - bundle exec pod install
 script:
   - xcodebuild -workspace Demo.xcworkspace -scheme Demo -destination 'platform=iOS Simulator,OS=9.3,name=iPhone 5s' build-for-testing test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -t baed7244-2a4c-4d12-a05e-0802361732dd

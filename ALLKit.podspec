@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name                       = 'ALLKit'
-  s.version                    = '0.0.1'
-  s.summary                    = 'Async list layout kit'
+  s.version                    = '0.0.2'
+  s.summary                    = 'Async List Layout Kit'
   s.homepage                   = 'https://github.com/geor-kasapidi/ALLKit'
   s.license                    = { :type => 'MIT', :file => 'LICENSE' }
   s.author                     = { 'Georgy Kasapidi' => 'geor.kasapidi@icloud.com' }

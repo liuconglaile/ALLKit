@@ -32,11 +32,11 @@ final class FeedViewController: UIViewController {
 
         adapter.collectionView.frame = view.bounds
 
-        adapter.set(boundingSize: BoundingSize(width: view.bounds.width, height: .nan))
+        adapter.set(boundingSize: BoundingSize(width: view.bounds.width))
     }
 
-    private func generateItems() -> [ListViewItem] {
-        return (0..<100).flatMap { _ -> [ListViewItem] in
+    private func generateItems() -> [ListItem] {
+        return (0..<100).flatMap { _ -> [ListItem] in
             let item = FeedItem(
                 avatar: URL(string: "https://picsum.photos/100/100?random&q=\(arc4random())"),
                 title: UUID().uuidString,
@@ -46,11 +46,19 @@ final class FeedViewController: UIViewController {
                 viewsCount: UInt(arc4random() % 1000)
             )
 
-            let listItem = ListItem(id: item.id, model: item, layoutDescription: FeedItemLayoutDescription(item: item))
+            let listItem = ListItem(
+                id: item.id,
+                model: item,
+                layoutSpec: FeedItemLayoutSpec(item: item)
+            )
 
             let sep = item.id + "_sep"
 
-            let sepListItem = ListItem(id: sep, model: sep, layoutDescription: FeedItemSeparatorLayoutDescription())
+            let sepListItem = ListItem(
+                id: sep,
+                model: sep,
+                layoutSpec: FeedItemSeparatorLayoutSpec()
+            )
 
             return [listItem, sepListItem]
         }

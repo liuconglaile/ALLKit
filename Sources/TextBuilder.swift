@@ -2,9 +2,7 @@ import Foundation
 import UIKit
 
 public func + (x: NSMutableAttributedString, y: NSAttributedString) -> NSMutableAttributedString {
-    x.append(y)
-
-    return x
+    return x.appending(y)
 }
 
 public final class Text {
@@ -38,9 +36,10 @@ public final class Text {
         return self
     }
 
-    @available(iOS 9.0, *)
     public func allowsDefaultTighteningForTruncation(_ value: Bool) -> Self {
-        paragraphStyle.allowsDefaultTighteningForTruncation = value
+        if #available(iOS 9.0, *) {
+            paragraphStyle.allowsDefaultTighteningForTruncation = value
+        }
 
         return self
     }
@@ -165,7 +164,16 @@ public final class Text {
         return self
     }
 
-    public func shadow(_ value: NSShadow) -> Self {
+    public func shadow(offsetX: CGFloat,
+                       offsetY: CGFloat,
+                       blurRadius: CGFloat,
+                       color: UIColor?) -> Self {
+
+        let value = NSShadow()
+        value.shadowOffset = CGSize(width: offsetX, height: offsetY)
+        value.shadowBlurRadius = blurRadius
+        value.shadowColor = color
+
         attributes[.shadow] = value
 
         return self
@@ -233,5 +241,13 @@ public final class Text {
 extension String {
     public func attributed() -> Text {
         return Text(self)
+    }
+}
+
+extension NSMutableAttributedString {
+    public func appending(_ attrString: NSAttributedString) -> Self {
+        append(attrString)
+
+        return self
     }
 }

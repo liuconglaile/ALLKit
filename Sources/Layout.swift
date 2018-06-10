@@ -1,75 +1,81 @@
 import UIKit
 
-public struct ViewFactory {
-    let makeView: () -> UIView
-    let configureView: (UIView, Bool) -> Void
+public protocol Layout {
+    var size: CGSize { get }
+    
+    func makeContentIn(view: UIView)
 }
 
-public typealias ViewFactories = [Int: ViewFactory]
-
-public struct ViewLayout<ViewType: UIView> {
-    let yogaLayout: YogaLayout
-    let viewFactories: ViewFactories
-
-    public var size: CGSize {
-        return yogaLayout.size
-    }
-
-    public func configure(view: ViewType) {
-        view.frame = CGRect(origin: .zero, size: yogaLayout.size)
-
-        if view.subviews.isEmpty {
-            let viewFactories: [ViewFactory] = self.viewFactories.sorted(by: { (x, y) -> Bool in
-                return x.key < y.key
-            }).map({ $0.value })
-
-            viewFactories.forEach { factory in
-                let subview = factory.makeView()
-
-                view.addSubview(subview)
-
-                subview.frame = yogaLayout.frames[subview.tag] ?? .zero
-
-                factory.configureView(subview, true)
-            }
-        } else {
-            view.subviews.forEach { subview in
-                subview.frame = yogaLayout.frames[subview.tag] ?? .zero
-
-                viewFactories[subview.tag]?.configureView(subview, false)
-            }
-        }
-    }
-
-    public func makeView() -> ViewType {
-        let view = ViewType(frame: .zero)
-
-        configure(view: view)
-
-        return view
+extension Layout {
+    public func setup(in view: UIView, at origin: CGPoint = .zero) {
+        view.frame = CGRect(origin: origin, size: size)
+        
+        makeContentIn(view: view)
     }
 }
 
-open class ViewLayoutDescription<ViewType: UIView> {
-    public typealias Body = (inout ViewFactories) -> YogaNode
+protocol LayoutCalculator {
+    func makeLayoutBy(spec: LayoutSpec, boundingSize: BoundingSize) -> Layout
+}
 
-    private let body: Body
-
-    public init(_ body: @escaping Body) {
-        self.body = body
+open class LayoutSpec {
+    public init() {}
+    
+    open func makeNode() -> Node {
+        fatalError()
+    }
+    
+    public final func makeLayoutWith(boundingSize: BoundingSize) -> Layout {
+        return FlatLayoutCalculator().makeLayoutBy(spec: self, boundingSize: boundingSize)
     }
 
-    public final func makeNode(_ viewFactories: inout ViewFactories) -> YogaNode {
-        return body(&viewFactories)
+    internal lazy var name = String(describing: type(of: self))
+}
+
+protocol ViewFactory {
+    func makeView() -> UIView
+
+    func config(view: UIView, firstTime: Bool)
+}
+
+final class ViewFactoryImp<ViewType: UIView>: ViewFactory {
+    private let config: (ViewType, Bool) -> Void
+
+    init(_ config: @escaping (ViewType, Bool) -> Void) {
+        self.config = config
     }
 
-    public final func makeViewLayoutWith(boundingSize: BoundingSize) -> ViewLayout<ViewType> {
-        return autoreleasepool {
-            var viewFactories = ViewFactories()
+    func makeView() -> UIView {
+        return ViewType(frame: .zero)
+    }
 
-            let yogaLayout = makeNode(&viewFactories).calculateLayoutWith(boundingSize: boundingSize)
+    func config(view: UIView, firstTime: Bool) {
+        (view as? ViewType).flatMap { config($0, firstTime) }
+    }
+}
 
-            return ViewLayout<ViewType>(yogaLayout: yogaLayout, viewFactories: viewFactories)
-        }
+public final class Node {
+    let children: [Node]
+    let yoga: YogaNode
+    let viewFactory: ViewFactory?
+
+    public init<ViewType: UIView>(children: [Node] = [],
+                                  config: ((YogaNode) -> Void)? = nil,
+                                  view: ((ViewType, Bool) -> Void)? = nil) {
+        self.children = children
+        yoga = YogaNode(useTextSize: false)
+        viewFactory = view.flatMap { ViewFactoryImp($0) }
+        self.children.forEach { yoga.add(child: $0.yoga) }
+        config?(yoga)
+    }
+
+    public init<ViewType: UIView>(text: NSAttributedString?,
+                                  config: ((YogaNode) -> Void)? = nil,
+                                  view: @escaping (ViewType, Bool) -> Void) {
+        children = []
+        yoga = YogaNode(useTextSize: true)
+        viewFactory = ViewFactoryImp(view)
+        yoga.text = text
+        config?(yoga)
     }
 }

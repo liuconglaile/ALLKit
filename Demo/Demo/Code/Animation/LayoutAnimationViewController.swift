@@ -3,42 +3,34 @@ import UIKit
 import ALLKit
 
 final class LayoutAnimationViewController: UIViewController {
-    private lazy var layoutView = CircleAndSquareLayoutView()
-
-    private let layoutDescription = CircleAndSquareLayoutDescription()
-
-    private var currentLayout: ViewLayout<CircleAndSquareLayoutView>? {
-        didSet {
-            UIView.animate(withDuration: 1) {
-                self.currentLayout?.configure(view: self.layoutView)
-            }
-        }
-    }
+    private lazy var contentView = UIView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        do {
-            view.backgroundColor = UIColor.white
+        view.backgroundColor = UIColor.white
 
-            view.addSubview(layoutView)
-        }
+        view.addSubview(contentView)
 
-        do {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refresh))
-        }
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .refresh,
+            target: self,
+            action: #selector(refresh)
+        )
     }
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-
-        layoutView.frame = view.bounds
 
         refresh()
     }
 
     @objc
     private func refresh() {
-        currentLayout = layoutDescription.makeViewLayoutWith(boundingSize: BoundingSize(width: view.bounds.width, height: view.bounds.height))
+        let boundingSize = BoundingSize(width: view.bounds.width, height: view.bounds.height)
+
+        UIView.animate(withDuration: 1) {
+            CircleAndSquareLayoutSpec().makeLayoutWith(boundingSize: boundingSize).setup(in: self.contentView)
+        }
     }
 }

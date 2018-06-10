@@ -26,24 +26,26 @@ final class BoundingSizeDemoViewController: UIViewController {
 
         adapter.collectionView.frame = view.bounds
 
-        adapter.set(boundingSize: BoundingSize(width: view.bounds.width, height: .nan))
+        adapter.set(boundingSize: BoundingSize(width: view.bounds.width))
     }
 
-    private func generateItems() -> [ListViewItem] {
-        var items = [ListViewItem]()
+    private func generateItems() -> [ListItem] {
+        var items = [ListItem]()
 
         (0..<100).forEach { _ in
             let n = Int(arc4random_uniform(5))
 
             (0..<n).forEach { _ in
-                let layoutDescription = ColorViewLayoutDescription()
-
                 let id = UUID().uuidString
 
-                var listItem = ListItem(id: id, model: id, layoutDescription: layoutDescription)
+                let listItem = ListItem(
+                    id: id,
+                    model: id,
+                    layoutSpec: ColorViewLayoutSpec()
+                )
 
                 listItem.boundingSizeModifier = { bs in
-                    BoundingSize(width: (bs.width / CGFloat(n)).rounded(.down), height: .nan)
+                    BoundingSize(width: (bs.width / CGFloat(n)).rounded(.down))
                 }
 
                 items.append(listItem)

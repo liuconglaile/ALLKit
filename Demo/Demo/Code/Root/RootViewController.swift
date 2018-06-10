@@ -19,7 +19,7 @@ final class RootViewController: UIViewController {
         }
 
         do {
-            adapter.behavior.deselectOnSelect = true
+            adapter.settings.deselectOnSelect = true
 
             adapter.configureCell = { (cell, _) in
                 guard cell.selectedBackgroundView == nil else {
@@ -76,19 +76,39 @@ final class RootViewController: UIViewController {
                     let vc = BoundingSizeDemoViewController()
 
                     self?.navigationController?.pushViewController(vc, animated: true)
+                }),
+                ("Horizontal list in row", { [weak self] in
+                    let vc = MultiGalleriesViewController()
+
+                    self?.navigationController?.pushViewController(vc, animated: true)
                 })
             ]
 
-            let items = menuRows.flatMap { row -> [ListViewItem] in
-                var rowItem = ListItem(id: row.name, model: row.name, layoutDescription: SelectableRowLayoutDescription(text: row.name))
+            let items = menuRows.enumerated().flatMap { (index, row) -> [ListItem] in
+                let rowItem = ListItem(
+                    id: row.name,
+                    model: row.name,
+                    layoutSpec: SelectableRowLayoutSpec(text: row.name)
+                )
 
-                rowItem.onSelect = row.onSelect
+                if index % 2 == 0 {
+                    let swipeAction = SwipeAction(text: "💥".attributed().font(UIFont.systemFont(ofSize: 40)).make(), color: #colorLiteral(red: 0.2588235438, green: 0.7568627596, blue: 0.9686274529, alpha: 1), {})
+
+                    rowItem.actions.onSwipe = [swipeAction]
+                }
+
+                rowItem.actions.onSelect = row.onSelect
+                rowItem.actions.onCopy = {
+                    print(row.name)
+                }
 
                 let sep = row.name + "_sep"
 
-                var rowSeparatorItem = ListItem(id: sep, model: sep, layoutDescription: RowSeparatorLayoutDescription())
-
-                rowSeparatorItem.canSelect = false
+                let rowSeparatorItem = ListItem(
+                    id: sep,
+                    model: sep,
+                    layoutSpec: RowSeparatorLayoutSpec()
+                )
 
                 return [rowItem, rowSeparatorItem]
             }
@@ -108,6 +128,6 @@ final class RootViewController: UIViewController {
 
         adapter.collectionView.frame = view.bounds
 
-        adapter.set(boundingSize: BoundingSize(width: view.bounds.width, height: .nan))
+        adapter.set(boundingSize: BoundingSize(width: view.bounds.width))
     }
 }

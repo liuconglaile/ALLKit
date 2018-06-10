@@ -61,37 +61,53 @@ final class ChatViewController: UIViewController {
 
         adapter.collectionView.frame = view.bounds
 
-        adapter.set(boundingSize: BoundingSize(width: view.bounds.width, height: .nan))
+        adapter.set(boundingSize: BoundingSize(width: view.bounds.width))
     }
 
-    private func generateItems() -> [ListViewItem] {
+    private func generateItems() -> [ListItem] {
         let sentences = DemoContent.loremIpsum
         let emodji = DemoContent.emodjiString
 
-        return (0..<100).flatMap { n -> [ListViewItem] in
-            let firstMessageItem: ListViewItem
+        return (0..<100).flatMap { n -> [ListItem] in
+            let firstMessageItem: ListItem
 
             do {
                 let text = sentences[Int(UInt(arc4random()) % UInt(sentences.count))]
                 let message = Message(text: text, date: Date())
 
                 if n % 2 == 0 {
-                    firstMessageItem = ListItem(id: message.id, model: message, layoutDescription: IncomingTextMessageLayoutDescription(text: message.text, date: message.date))
+                    firstMessageItem = ListItem(
+                        id: message.id,
+                        model: message,
+                        layoutSpec: IncomingTextMessageLayoutSpec(text: message.text, date: message.date)
+                    )
                 } else {
-                    firstMessageItem = ListItem(id: message.id, model: message, layoutDescription: OutgoingTextMessageLayoutDescription(text: message.text, date: message.date))
+                    firstMessageItem = ListItem(
+                        id: message.id,
+                        model: message,
+                        layoutSpec: OutgoingTextMessageLayoutSpec(text: message.text, date: message.date)
+                    )
                 }
             }
 
-            let secondMessageItem: ListViewItem
+            let secondMessageItem: ListItem
 
             do {
-                let text = String(emodji.prefix(Int(UInt(arc4random()) % UInt(emodji.count))))
+                let text = String(emodji.prefix(max(1, Int(UInt(arc4random()) % UInt(emodji.count)))))
                 let message = Message(text: text, date: Date())
 
                 if n % 2 == 0 {
-                    secondMessageItem = ListItem(id: message.id, model: message, layoutDescription: IncomingTextMessageLayoutDescription(text: message.text, date: message.date))
+                    secondMessageItem = ListItem(
+                        id: message.id,
+                        model: message,
+                        layoutSpec: IncomingTextMessageLayoutSpec(text: message.text, date: message.date)
+                    )
                 } else {
-                    secondMessageItem = ListItem(id: message.id, model: message, layoutDescription: OutgoingTextMessageLayoutDescription(text: message.text, date: message.date))
+                    secondMessageItem = ListItem(
+                        id: message.id,
+                        model: message,
+                        layoutSpec: OutgoingTextMessageLayoutSpec(text: message.text, date: message.date)
+                    )
                 }
             }
 

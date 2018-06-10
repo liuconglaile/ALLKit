@@ -26,18 +26,22 @@ final class AutoDiffViewController: UIViewController {
         }
 
         do {
-            adapter.behavior.allowMovesInBatchUpdates = true
+            adapter.settings.allowMovesInBatchUpdates = true
         }
 
         do {
-            let controlsView = AdapterControlsLayoutDescription(
+            let controlsView = UIView()
+
+            AdapterControlsLayoutSpec(
                 delayChanged: { [weak self] delay in
                     self?.delay = delay
                 },
                 movesEnabledChanged: { [weak self] movesEnabled in
-                    self?.adapter.behavior.allowMovesInBatchUpdates = movesEnabled
+                    self?.adapter.settings.allowMovesInBatchUpdates = movesEnabled
                 }
-            ).makeViewLayoutWith(boundingSize: BoundingSize(width: 300, height: 40)).makeView()
+                )
+                .makeLayoutWith(boundingSize: BoundingSize(width: 300, height: 40))
+                .setup(in: controlsView)
 
             setToolbarItems([UIBarButtonItem(customView: controlsView)], animated: false)
         }
@@ -66,8 +70,12 @@ final class AutoDiffViewController: UIViewController {
     private func generateItems() {
         let numbers = (0..<100).map { _ in Int(arc4random_uniform(100)) }
 
-        let items = numbers.map { number -> ListViewItem in
-            ListItem(id: String(number), model: number, layoutDescription: NumberLayoutDescription(number: number))
+        let items = numbers.map { number -> ListItem in
+            ListItem(
+                id: String(number),
+                model: number,
+                layoutSpec: NumberLayoutSpec(number: number)
+            )
         }
 
         adapter.set(items: items)
